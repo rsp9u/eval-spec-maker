@@ -30,6 +30,7 @@ class XlsxCreator {
     private val cellStyleHeader: CellStyle
 
     private enum class Column(val title: String) {
+        NUMBER("#"),
         MAJOR("大項目"),
         MIDDLE("中項目"),
         MINOR("小項目"),
@@ -113,6 +114,7 @@ class XlsxCreator {
 
     private fun createCategory(categoryItem: TestItem) {
         val sheet = book.createSheet(categoryItem.bodies)
+
         // グリッド表示を消す.
         sheet.isDisplayGridlines = false
 
@@ -120,7 +122,7 @@ class XlsxCreator {
 
         var rowIndex = HEADER_INDEX + 1
 
-        categoryItem.children.forEach { major ->
+        categoryItem.children.forEachIndexed { majorIndex, major ->
             val majorBody = major.bodies
             var majorLineCount = estimateLineCount(majorBody)
 
@@ -143,6 +145,9 @@ class XlsxCreator {
                         setCellValue(sheet, Column.MIDDLE.index, rowIndex, "").cellStyle = cellStyleNoVerticalBorder
                         middleLineCount = 1
                     }
+
+                    // 項目番号
+                    setCellValue(sheet, Column.NUMBER.index, rowIndex, "%d-%d-%d".format(majorIndex+1, middleIndex+1, minorIndex+1))
 
                     val minorBody = minor.bodies
                     val method = minor.methods
