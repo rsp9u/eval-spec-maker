@@ -48,6 +48,17 @@ object MarkdownParser {
             } else {
                 val target = parentStack.lastOrNull() ?: return
                 when(node) {
+                    is StrongEmphSuperNode -> {
+                        val child = node.children[0]
+                        if (child is TextNode) {
+                            val text = child.text.trim { it <= ' ' }
+                            if (!text.isEmpty()) {
+                                logger.i(String.format(Locale.JAPAN, "bold-text:%s", text))
+                                target.assignee = text
+                            }
+                        }
+                        return
+                    }
                     is TextNode -> {
                         val text = node.text.trim { it <= ' ' }
                         if (!text.isEmpty()) {

@@ -7,7 +7,7 @@ internal class TestItem {
         // 試験手順
         METHOD,
         // 確認点
-        CONFIRM
+        CONFIRM,
     }
 
     private val _children = mutableListOf<TestItem>()
@@ -30,6 +30,7 @@ internal class TestItem {
     val confirms: String
         get() = textListToString(confirmList)
 
+    var assignee = ""
 
 
     private fun textListToString(list: List<String>): String {

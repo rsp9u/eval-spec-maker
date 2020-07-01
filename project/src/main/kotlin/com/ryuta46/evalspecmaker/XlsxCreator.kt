@@ -98,6 +98,19 @@ class XlsxCreator {
         }
     }
 
+    private fun selectAssignee(major: TestItem, middle: TestItem, minor: TestItem): String {
+        if (!minor.assignee.isEmpty()) {
+            return minor.assignee
+        }
+        if (!middle.assignee.isEmpty()) {
+            return middle.assignee
+        }
+        if (!major.assignee.isEmpty()) {
+            return major.assignee
+        }
+        return ""
+    }
+
     private fun createCategory(categoryItem: TestItem) {
         val sheet = book.createSheet(categoryItem.bodies)
         // グリッド表示を消す.
@@ -110,6 +123,7 @@ class XlsxCreator {
         categoryItem.children.forEach { major ->
             val majorBody = major.bodies
             var majorLineCount = estimateLineCount(majorBody)
+
             setCellValue(sheet, Column.MAJOR.index, rowIndex, majorBody).cellStyle = cellStyleNoBottomBorder
 
             major.children.forEachIndexed { middleIndex, middle ->
@@ -140,6 +154,10 @@ class XlsxCreator {
                     // 確認点
                     setCellValue(sheet, Column.CONFIRM.index, rowIndex, confirm)
 
+                    // 試験者
+                    val assignee = selectAssignee(major, middle, minor)
+                    setCellValue(sheet, Column.TESTER.index, rowIndex, assignee).cellStyle = cellStyleCenter
+
 
                     // 各列の行数の推測値から最大のものを列の高さに設定
                     var maxRowHeightUnit = Math.max(majorLineCount, middleLineCount)
@@ -154,7 +172,7 @@ class XlsxCreator {
                     // スタイルのみ設定する項目を設定
                     setCellValue(sheet, Column.RESULT.index, rowIndex, "").cellStyle = cellStyleCenter
                     setCellValue(sheet, Column.DATE.index, rowIndex, "")
-                    setCellValue(sheet, Column.TESTER.index, rowIndex, "").cellStyle = cellStyleCenter
+                    //setCellValue(sheet, Column.TESTER.index, rowIndex, "").cellStyle = cellStyleCenter
                     setCellValue(sheet, Column.INFO.index, rowIndex, "")
 
                     rowIndex++
