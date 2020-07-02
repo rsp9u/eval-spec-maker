@@ -8,6 +8,8 @@ internal class TestItem {
         METHOD,
         // 確認点
         CONFIRM,
+        // 補足
+        COMMENT,
     }
 
     private val _children = mutableListOf<TestItem>()
@@ -17,6 +19,7 @@ internal class TestItem {
     private val bodyList = mutableListOf<String>()
     private val methodList = mutableListOf<String>()
     private val confirmList = mutableListOf<String>()
+    private val commentList = mutableListOf<String>()
 
     private var mAddTarget = TextContainer.BODY
 
@@ -29,9 +32,20 @@ internal class TestItem {
         get() = textListToString(methodList)
     val confirms: String
         get() = textListToString(confirmList)
+    val comments: String
+        get() = textListToString(commentList)
 
-    var assignee = ""
+    var assignee = mutableMapOf<String, String>()
 
+    fun setAssignee(text: String) {
+        val sp = text.split(":")
+        if (sp.size == 1) {
+            assignee["any"] = text
+        }
+        if (sp.size >= 2) {
+            assignee[sp[0]] = sp[1]
+        }
+    }
 
     private fun textListToString(list: List<String>): String {
         if (list.isEmpty()) {
@@ -58,6 +72,7 @@ internal class TestItem {
             TextContainer.BODY -> bodyList.add(text)
             TextContainer.METHOD -> methodList.add((methodList.size + 1).toString() + ". " + text)
             TextContainer.CONFIRM -> confirmList.add("・" + text)
+            TextContainer.COMMENT -> commentList.add("・" + text)
         }
     }
 

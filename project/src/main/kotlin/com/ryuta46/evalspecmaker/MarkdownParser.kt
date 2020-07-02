@@ -54,7 +54,7 @@ object MarkdownParser {
                             val text = child.text.trim { it <= ' ' }
                             if (!text.isEmpty()) {
                                 logger.i(String.format(Locale.JAPAN, "bold-text:%s", text))
-                                target.assignee = text
+                                target.setAssignee(text)
                             }
                         }
                         return
@@ -63,7 +63,13 @@ object MarkdownParser {
                         val text = node.text.trim { it <= ' ' }
                         if (!text.isEmpty()) {
                             logger.i(String.format(Locale.JAPAN, "text:%s", text))
-                            target.addText(text)
+                            if (text.startsWith("!")) {
+                                target.setAddTarget(TestItem.TextContainer.COMMENT)
+                                val comment = text.trim('!', ' ')
+                                if (!comment.isEmpty()) { target.addText(comment) }
+                            } else {
+                                target.addText(text)
+                            }
                         }
                     }
                     is ListItemNode -> target.setAddTarget(TestItem.TextContainer.METHOD)
