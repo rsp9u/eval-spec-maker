@@ -76,6 +76,29 @@ internal class TestItem {
         }
     }
 
+    fun inheritComment(parent: TestItem) {
+        for (comment in parent.getCommentList()) {
+            commentList.add(comment)
+        }
+    }
+
+    fun getCommentList(): List<String> {
+        return commentList
+    }
+
+    fun containsComment(text: String): Boolean {
+        for (comment in commentList) {
+            if (comment.equals(text)) {
+                return true
+            }
+        }
+        return false
+    }
+
+    fun removeComment(text: String) {
+        commentList.removeAll { it.equals(text) }
+    }
+
 
     fun printInformation(level: Int) {
         val builder = StringBuilder()

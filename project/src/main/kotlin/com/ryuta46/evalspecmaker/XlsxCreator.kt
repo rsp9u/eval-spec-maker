@@ -197,13 +197,6 @@ class XlsxCreator {
     }
 
     private fun createCategory(categoryItem: TestItem) {
-        val matrix = listOf(
-            listOf("Chrome", "日本語"),
-            listOf("Chrome", "英語"),
-            listOf("iPad", "日本語"),
-            listOf("iPad", "英語")
-        )
-
         val sheet = book.createSheet(categoryItem.bodies)
 
         // グリッド表示を消す.
@@ -219,13 +212,28 @@ class XlsxCreator {
 
                 middle.children.forEachIndexed { minorIndex, minor ->
 
-                    if (minor.comments.equals("・テスト対象外")) {
+                    if (minor.containsComment("・テスト対象外")) {
                         setRow(sheet, rowIndex, major, majorIndex, middle, middleIndex, minor, minorIndex, "", "", 0)
                         rowIndex++
                     } else {
+                        var clients = listOf("Chrome", "iPad")
+                        if (minor.containsComment("・no-chrome")) {
+                            minor.removeComment("・no-chrome")
+                            clients = listOf("iPad")
+                        } else if (minor.containsComment("・no-ipad")) {
+                            minor.removeComment("・no-ipad")
+                            clients = listOf("Chrome")
+                        }
+                        var langs = listOf("日本語", "英語")
+                        if (minor.containsComment("・no-lang")) {
+                            minor.removeComment("・no-lang")
+                            langs = listOf("")
+                        }
+                        val matrix = product(clients, langs)
+
                         matrix.forEachIndexed { matrixIndex, clientLang ->
-                            val client = clientLang[0]
-                            val lang = clientLang[1]
+                            val client = clientLang.first
+                            val lang = clientLang.second
                             setRow(sheet, rowIndex, major, majorIndex, middle, middleIndex, minor, minorIndex, client, lang, matrixIndex)
                             rowIndex++
                         }
@@ -280,6 +288,16 @@ class XlsxCreator {
         Column.values().forEach { column ->
             setCellValue(sheet, column.index, Companion.HEADER_INDEX, column.title).cellStyle = cellStyleHeader
         }
+    }
+
+    private fun product(a: List<String>, b: List<String>): List<Pair<String, String>> {
+        val ret = mutableListOf<Pair<String, String>>()
+        for (aElem in a) {
+            for (bElem in b) {
+                ret.add(Pair(aElem, bElem))
+            }
+        }
+        return ret
     }
 
 }

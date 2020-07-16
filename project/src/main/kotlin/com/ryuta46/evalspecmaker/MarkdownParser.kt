@@ -44,6 +44,7 @@ object MarkdownParser {
 
                 val newItem = TestItem().apply { level = nodeLevel }
                 target.addChild(newItem)
+                newItem.inheritComment(target)
                 parentStack.add(newItem)
             } else {
                 val target = parentStack.lastOrNull() ?: return
@@ -63,10 +64,18 @@ object MarkdownParser {
                         val text = node.text.trim { it <= ' ' }
                         if (!text.isEmpty()) {
                             logger.i(String.format(Locale.JAPAN, "text:%s", text))
+                            if (text.equals("!")) {
+                                logger.i("switched to comment")
+                                target.setAddTarget(TestItem.TextContainer.COMMENT)
+                                return
+                            }
+
                             if (text.startsWith("!")) {
                                 target.setAddTarget(TestItem.TextContainer.COMMENT)
                                 val comment = text.trim('!', ' ')
-                                if (!comment.isEmpty()) { target.addText(comment) }
+                                if (!comment.isEmpty()) {
+                                    target.addText(comment)
+                                }
                             } else {
                                 target.addText(text)
                             }
