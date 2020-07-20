@@ -22,6 +22,7 @@ internal class TestItem {
     private val commentList = mutableListOf<String>()
 
     private var mAddTarget = TextContainer.BODY
+    private var mConcatinating = false
 
     var level = 0
 
@@ -65,14 +66,39 @@ internal class TestItem {
 
     fun setAddTarget(target: TextContainer) {
         mAddTarget = target
+        mConcatinating = false
     }
 
     fun addText(text: String) {
+        if (mConcatinating) {
+            concatText(text)
+        } else {
+            appendText(text)
+            mConcatinating = true
+        }
+    }
+
+    fun appendText(text: String) {
         when (mAddTarget) {
             TextContainer.BODY -> bodyList.add(text)
             TextContainer.METHOD -> methodList.add((methodList.size + 1).toString() + ". " + text)
             TextContainer.CONFIRM -> confirmList.add("・" + text)
             TextContainer.COMMENT -> commentList.add("・" + text)
+        }
+    }
+
+    fun concatText(text: String) {
+        when (mAddTarget) {
+            TextContainer.BODY -> concatTextToListTail(text, bodyList)
+            TextContainer.METHOD -> concatTextToListTail(text, methodList)
+            TextContainer.CONFIRM -> concatTextToListTail(text, confirmList)
+            TextContainer.COMMENT -> concatTextToListTail(text, commentList)
+        }
+    }
+
+    fun concatTextToListTail(text: String, list: MutableList<String>) {
+        if (list.size != 0) {
+            list[list.size - 1] = list[list.size - 1] + text
         }
     }
 
@@ -86,10 +112,16 @@ internal class TestItem {
         return commentList
     }
 
-    fun containsComment(text: String): Boolean {
+    fun containsComment(text: String, exactMatch: Boolean): Boolean {
         for (comment in commentList) {
-            if (comment.equals(text)) {
-                return true
+            if (exactMatch) {
+                if (comment.equals(text)) {
+                    return true
+                }
+            } else {
+                if (comment.contains(text)) {
+                    return true
+                }
             }
         }
         return false

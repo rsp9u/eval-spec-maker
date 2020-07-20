@@ -212,20 +212,20 @@ class XlsxCreator {
 
                 middle.children.forEachIndexed { minorIndex, minor ->
 
-                    if (minor.containsComment("・テスト対象外")) {
+                    if (minor.containsComment("テスト対象外", false)) {
                         setRow(sheet, rowIndex, major, majorIndex, middle, middleIndex, minor, minorIndex, "", "", 0)
                         rowIndex++
                     } else {
                         var clients = listOf("Chrome", "iPad")
-                        if (minor.containsComment("・no-chrome")) {
+                        if (minor.containsComment("・no-chrome", true)) {
                             minor.removeComment("・no-chrome")
                             clients = listOf("iPad")
-                        } else if (minor.containsComment("・no-ipad")) {
+                        } else if (minor.containsComment("・no-ipad", true)) {
                             minor.removeComment("・no-ipad")
                             clients = listOf("Chrome")
                         }
                         var langs = listOf("日本語", "英語")
-                        if (minor.containsComment("・no-lang")) {
+                        if (minor.containsComment("・no-lang", true)) {
                             minor.removeComment("・no-lang")
                             langs = listOf("")
                         }

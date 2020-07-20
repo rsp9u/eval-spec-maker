@@ -60,6 +60,12 @@ object MarkdownParser {
                         }
                         return
                     }
+                    is CodeNode -> {
+                        var text = node.text.trim { it <= ' ' }
+                        text = text.replace("``", "`")
+                        text = String.format("\"%s\"", text)
+                        target.addText(text)
+                    }
                     is TextNode -> {
                         val text = node.text.trim { it <= ' ' }
                         if (!text.isEmpty()) {
@@ -81,9 +87,15 @@ object MarkdownParser {
                             }
                         }
                     }
-                    is ListItemNode -> target.setAddTarget(TestItem.TextContainer.METHOD)
-                    is RefLinkNode -> target.setAddTarget(TestItem.TextContainer.CONFIRM)
-                    else -> logger.d("Class:" + node.javaClass.name)
+                    is ListItemNode -> {
+                        logger.i("switched to method")
+                        target.setAddTarget(TestItem.TextContainer.METHOD)
+                    }
+                    is RefLinkNode -> {
+                        logger.i("switched to confirm")
+                        target.setAddTarget(TestItem.TextContainer.CONFIRM)
+                    }
+                    else -> logger.i("Class:" + node.javaClass.name)
                 }
             }
 
